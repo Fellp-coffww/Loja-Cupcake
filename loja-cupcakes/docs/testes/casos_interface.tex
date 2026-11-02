@@ -1,0 +1,37 @@
+\footnotesize
+\begin{longtable}{|c|c|p{9.4cm}|c|}
+\hline
+\rowcolor{gray!30} \textbf{Cód.} & \textbf{Refere-se a} & \textbf{Caso de teste de interface (comportamento esperado)} & \textbf{Result.} \\ \hline
+\endhead
+UI01 & ACESSO & Ao abrir, aparece somente a tela de login (loja e vitrine ocultas) & \cellcolor{green!20}OK \\ \hline
+UI02 & ACESSO & Login com senha errada mostra mensagem de erro e continua no login & \cellcolor{green!20}OK \\ \hline
+UI03 & ACESSO & Cadastro de conta nova volta ao login com o e-mail preenchido & \cellcolor{green!20}OK \\ \hline
+UI04 & ACESSO & Cadastro com senha curta mostra erro & \cellcolor{green!20}OK \\ \hline
+UI05 & US01 & Após o login aparece a vitrine com 5 cupcakes e some a tela de login & \cellcolor{green!20}OK \\ \hline
+UI06 & US01 & Produtos em destaque aparecem primeiro & \cellcolor{green!20}OK \\ \hline
+UI07 & US02 & Filtro 'Vegano' mostra 1 cupcake e 'Todas' volta aos 5 & \cellcolor{green!20}OK \\ \hline
+UI08 & US03 & Detalhes abre janela com ingredientes e preço & \cellcolor{green!20}OK \\ \hline
+UI09 & US04 & Adicionar mostra aviso e atualiza o contador do carrinho & \cellcolor{green!20}OK \\ \hline
+UI10 & US06 & Aba lateral abre o carrinho com 2 itens e total R\$ 31,50 & \cellcolor{green!20}OK \\ \hline
+UI11 & US05 & Remover item atualiza lista, total e contador & \cellcolor{green!20}OK \\ \hline
+UI12 & US05 & Carrinho vazio mostra mensagem e desabilita Finalizar pedido & \cellcolor{green!20}OK \\ \hline
+UI13 & ACESSO & Clicar fora da aba lateral (ou no X) fecha o painel & \cellcolor{green!20}OK \\ \hline
+UI14 & US09 & Finalizar pedido: escolher endereço da Maria e confirmar abre o pagamento & \cellcolor{green!20}OK \\ \hline
+UI15 & US10 & Pagamento recusado avisa o cliente; nova tentativa é aprovada & \cellcolor{green!20}OK \\ \hline
+UI16 & US11 & Meus pedidos mostra o pedido com status PAGO e pagamento APROVADO & \cellcolor{green!20}OK \\ \hline
+UI17 & ACESSO & Recarregar a página mantém o usuário logado & \cellcolor{green!20}OK \\ \hline
+UI18 & ACESSO & Cliente logado não vê o painel do dono em admin.html & \cellcolor{green!20}OK \\ \hline
+UI19 & ACESSO & Sair devolve à tela de login & \cellcolor{green!20}OK \\ \hline
+UI20 & US07 & Sem endereço, a janela de finalização já abre o formulário de novo endereço & \cellcolor{green!20}OK \\ \hline
+UI21 & US07 & CEP inválido mostra erro e o endereço não é salvo & \cellcolor{green!20}OK \\ \hline
+UI22 & US07 & Endereço válido é salvo e já fica selecionado & \cellcolor{green!20}OK \\ \hline
+UI23 & US09 & Pedido confirmado fica 'aguardando pagamento' com botão Pagar agora & \cellcolor{green!20}OK \\ \hline
+UI24 & ACESSO & Administrador que entra pela tela de login vai direto ao painel do dono & \cellcolor{green!20}OK \\ \hline
+UI25 & US15 & Dashboard mostra vendas, mais vendidos e estoque & \cellcolor{green!20}OK \\ \hline
+UI26 & US14 & Dono muda o status de PAGO para EM\_PREPARO & \cellcolor{green!20}OK \\ \hline
+UI27 & US14 & Pular etapa (EM\_PREPARO para ENTREGUE) mostra a mensagem de erro & \cellcolor{green!20}OK \\ \hline
+UI28 & US12 & Dono cadastra produto novo e ele aparece na lista de produtos & \cellcolor{green!20}OK \\ \hline
+UI29 & US12 & Cadastro com preço vazio é barrado na tela & \cellcolor{green!20}OK \\ \hline
+UI30 & US13 & Dono edita o estoque de um produto (repor estoque) & \cellcolor{green!20}OK \\ \hline
+UI31 & SEGURANÇA & Nome de produto com HTML aparece como texto (sem executar código) & \cellcolor{green!20}OK \\ \hline
+\end{longtable}\normalsize

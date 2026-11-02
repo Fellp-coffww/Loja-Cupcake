@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel do dono - Loja de Cupcakes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>🧁 Painel do dono</h1>
+  <div><span id="quem"></span> <button onclick="sair()">Sair</button></div>
+</header>
+<main>
+  <section id="sec-login" class="oculto">
+    <h2>Entrar como administrador</h2>
+    <div class="linha">
+      <input id="login-email" type="email" placeholder="E-mail">
+      <input id="login-senha" type="password" placeholder="Senha">
+      <button onclick="entrar()">Entrar</button>
+    </div>
+    <div id="msg-login" class="msg"></div>
+    <small>Demonstração: admin@cupcakes.com / 123456</small>
+  </section>
+
+  <div id="painel" class="oculto">
+    <section>
+      <h2>Dashboard de vendas</h2>
+      <div id="dashboard"></div>
+    </section>
+
+    <section>
+      <h2>Pedidos</h2>
+      <div id="pedidos"></div>
+      <div id="msg-pedidos" class="msg"></div>
+    </section>
+
+    <section>
+      <h2 id="titulo-form">Novo cupcake</h2>
+      <div class="linha">
+        <input id="p-nome" placeholder="Nome">
+        <input id="p-preco" type="number" step="0.01" placeholder="Preço">
+        <input id="p-estoque" type="number" placeholder="Estoque">
+        <input id="p-imagem" placeholder="URL da imagem (opcional)">
+      </div>
+      <div class="linha">
+        <textarea id="p-desc" rows="2" cols="40" placeholder="Descrição"></textarea>
+        <textarea id="p-ingr" rows="2" cols="40" placeholder="Ingredientes"></textarea>
+      </div>
+      <div class="linha">
+        <span>Categorias: </span><span id="p-categorias"></span>
+        <label><input type="checkbox" id="p-destaque"> Destaque</label>
+        <label><input type="checkbox" id="p-ativo" checked> Ativo</label>
+      </div>
+      <div class="linha">
+        <button onclick="salvarProduto()">Salvar</button>
+        <button class="sec" onclick="limparForm()">Limpar</button>
+      </div>
+      <div id="msg-produto" class="msg"></div>
+      <div id="produtos"></div>
+    </section>
+  </div>
+</main>
+<script src="api.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

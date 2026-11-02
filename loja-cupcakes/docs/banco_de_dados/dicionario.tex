@@ -1,0 +1,197 @@
+\subsubsection{Tabela \texttt{usuario}}
+\noindent Generalização de Cliente e Administrador; guarda credenciais de acesso.\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador do usuário \\ \hline
+\texttt{nome} & VARCHAR(100) & -- & Não & Nome completo (mín. 2 caracteres) \\ \hline
+\texttt{email} & VARCHAR(150) & UK & Não & E-mail de login (único, formato validado) \\ \hline
+\texttt{senha\_hash} & VARCHAR(255) & -- & Não & Hash da senha (nunca texto puro) \\ \hline
+\texttt{perfil} & perfil\_usuario & -- & Não & CLIENTE ou ADMINISTRADOR \\ \hline
+\texttt{ativo} & BOOLEAN & -- & Não & Indica se a conta está ativa \\ \hline
+\texttt{criado\_em} & TIMESTAMPTZ & -- & Não & Data/hora de criação \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{cliente}}
+\noindent Especialização 1:1 de Usuario com dados exclusivos do cliente.\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{usuario\_id} & BIGINT & PK, FK & Não & Identificador do cliente (= usuario.id) (ref. usuario) \\ \hline
+\texttt{telefone} & VARCHAR(15) & -- & Sim & Telefone apenas com dígitos (10 a 15) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{endereco}}
+\noindent Endereços de entrega salvos pelo cliente (US07).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador do endereço \\ \hline
+\texttt{cliente\_id} & BIGINT & FK & Não & Cliente proprietário (ref. cliente) \\ \hline
+\texttt{apelido} & VARCHAR(30) & -- & Sim & Nome amigável (ex.: Casa) \\ \hline
+\texttt{cep} & d\_cep & -- & Não & CEP com 8 dígitos \\ \hline
+\texttt{logradouro} & VARCHAR(150) & -- & Não & Rua/avenida \\ \hline
+\texttt{numero} & VARCHAR(10) & -- & Não & Número do imóvel \\ \hline
+\texttt{complemento} & VARCHAR(60) & -- & Sim & Complemento (opcional) \\ \hline
+\texttt{bairro} & VARCHAR(80) & -- & Não & Bairro \\ \hline
+\texttt{cidade} & VARCHAR(80) & -- & Não & Cidade \\ \hline
+\texttt{uf} & d\_uf & -- & Não & Sigla do estado (2 letras maiúsculas) \\ \hline
+\texttt{principal} & BOOLEAN & -- & Não & Endereço padrão (no máximo um ativo por cliente) \\ \hline
+\texttt{ativo} & BOOLEAN & -- & Não & Exclusão lógica do endereço \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{categoria}}
+\noindent Classificação dos cupcakes para filtro (US02).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & SMALLINT & PK & Não & Identificador da categoria \\ \hline
+\texttt{nome} & VARCHAR(50) & UK & Não & Nome único (ex.: Vegano) \\ \hline
+\texttt{ativa} & BOOLEAN & -- & Não & Categoria disponível para filtro \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{cupcake}}
+\noindent Produto vendido na loja (US01, US03, US12, US13).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador do produto \\ \hline
+\texttt{nome} & VARCHAR(100) & UK & Não & Nome único do cupcake \\ \hline
+\texttt{descricao} & TEXT & -- & Não & Descrição exibida ao cliente \\ \hline
+\texttt{ingredientes} & TEXT & -- & Sim & Lista de ingredientes \\ \hline
+\texttt{preco} & NUMERIC(10,2) & -- & Não & Preço atual de venda ($>$ 0) \\ \hline
+\texttt{imagem\_url} & VARCHAR(255) & -- & Sim & Endereço da imagem \\ \hline
+\texttt{estoque} & INTEGER & -- & Não & Unidades disponíveis ($\geq$ 0) \\ \hline
+\texttt{destaque} & BOOLEAN & -- & Não & Ordena a vitrine (CA03 da US01) \\ \hline
+\texttt{ativo} & BOOLEAN & -- & Não & RN01: somente ativos aparecem na vitrine \\ \hline
+\texttt{criado\_em} & TIMESTAMPTZ & -- & Não & Data/hora de cadastro \\ \hline
+\texttt{atualizado\_em} & TIMESTAMPTZ & -- & Não & Última alteração (trigger) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{cupcake\_categoria}}
+\noindent Associação N:N entre cupcake e categoria.\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{cupcake\_id} & BIGINT & PK, FK & Não & Cupcake classificado (ref. cupcake) \\ \hline
+\texttt{categoria\_id} & SMALLINT & PK, FK & Não & Categoria atribuída (ref. categoria) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{carrinho}}
+\noindent Carrinho persistido no banco (US04 a US06, RNF04).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador do carrinho \\ \hline
+\texttt{cliente\_id} & BIGINT & FK & Não & Dono do carrinho (ref. cliente) \\ \hline
+\texttt{status} & status\_carrinho & -- & Não & ABERTO, CONVERTIDO ou ABANDONADO (um ABERTO por cliente) \\ \hline
+\texttt{criado\_em} & TIMESTAMPTZ & -- & Não & Criação \\ \hline
+\texttt{atualizado\_em} & TIMESTAMPTZ & -- & Não & Última alteração (trigger) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{item\_carrinho}}
+\noindent Itens do carrinho (classe ItemCarrinho).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{carrinho\_id} & BIGINT & PK, FK & Não & Carrinho (ref. carrinho) \\ \hline
+\texttt{cupcake\_id} & BIGINT & PK, FK & Não & Produto (ref. cupcake) \\ \hline
+\texttt{quantidade} & SMALLINT & -- & Não & RN04/RN05: mínimo 1 \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{pedido}}
+\noindent Pedido confirmado (US09); guarda cópia do endereço de entrega.\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Número do pedido \\ \hline
+\texttt{cliente\_id} & BIGINT & FK & Não & Cliente que comprou (ref. cliente) \\ \hline
+\texttt{status} & status\_pedido & -- & Não & Situação atual (fluxo controlado por RN14) \\ \hline
+\texttt{data\_pedido} & TIMESTAMPTZ & -- & Não & Data/hora da confirmação \\ \hline
+\texttt{entrega\_cep} & d\_cep & -- & Não & CEP de entrega (cópia) \\ \hline
+\texttt{entrega\_logradouro} & VARCHAR(150) & -- & Não & Rua de entrega (cópia) \\ \hline
+\texttt{entrega\_numero} & VARCHAR(10) & -- & Não & Número de entrega (cópia) \\ \hline
+\texttt{entrega\_complemento} & VARCHAR(60) & -- & Sim & Complemento (cópia) \\ \hline
+\texttt{entrega\_bairro} & VARCHAR(80) & -- & Não & Bairro de entrega (cópia) \\ \hline
+\texttt{entrega\_cidade} & VARCHAR(80) & -- & Não & Cidade de entrega (cópia) \\ \hline
+\texttt{entrega\_uf} & d\_uf & -- & Não & UF de entrega (cópia) \\ \hline
+\texttt{taxa\_entrega} & NUMERIC(10,2) & -- & Não & Taxa de entrega em R\$ \\ \hline
+\texttt{valor\_total} & NUMERIC(10,2) & -- & Não & Itens + taxa de entrega em R\$ \\ \hline
+\texttt{atualizado\_em} & TIMESTAMPTZ & -- & Não & Última alteração (trigger) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{item\_pedido}}
+\noindent Itens do pedido com preço congelado.\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{pedido\_id} & BIGINT & PK, FK & Não & Pedido (ref. pedido) \\ \hline
+\texttt{cupcake\_id} & BIGINT & PK, FK & Não & Produto vendido (ref. cupcake) \\ \hline
+\texttt{quantidade} & SMALLINT & -- & Não & Quantidade ($\geq$ 1) \\ \hline
+\texttt{preco\_unitario} & NUMERIC(10,2) & -- & Não & Preço no momento da compra \\ \hline
+\texttt{subtotal} & NUMERIC(10,2) & -- & Não & quantidade x preco\_unitario (coluna gerada) \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{pagamento}}
+\noindent Tentativas de pagamento de um pedido (US08, US10).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador da tentativa \\ \hline
+\texttt{pedido\_id} & BIGINT & FK & Não & Pedido pago (ref. pedido) \\ \hline
+\texttt{metodo} & metodo\_pagamento & -- & Não & PIX ou CARTAO (RN08) \\ \hline
+\texttt{status} & status\_pagamento & -- & Não & PENDENTE, APROVADO, RECUSADO ou ESTORNADO \\ \hline
+\texttt{valor} & NUMERIC(10,2) & -- & Não & Valor cobrado ($>$ 0) \\ \hline
+\texttt{gateway\_transacao\_id} & VARCHAR(100) & UK & Sim & ID da transação no gateway (único; sem dados de cartão) \\ \hline
+\texttt{criado\_em} & TIMESTAMPTZ & -- & Não & Início da tentativa \\ \hline
+\texttt{processado\_em} & TIMESTAMPTZ & -- & Sim & Retorno do gateway \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{transicao\_status\_pedido}}
+\noindent Tabela de apoio com o fluxo válido de status (RN14).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{de} & status\_pedido & PK & Não & Status de origem \\ \hline
+\texttt{para} & status\_pedido & PK & Não & Status de destino permitido \\ \hline
+\end{longtable}
+\endgroup
+\subsubsection{Tabela \texttt{historico\_status\_pedido}}
+\noindent Auditoria das mudanças de status; alimenta o acompanhamento (US11).\par\smallskip
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.0cm}|p{2.6cm}|c|c|p{5.6cm}|}
+\hline
+\rowcolor{gray!40}\textbf{Coluna} & \textbf{Tipo} & \textbf{Chave} & \textbf{Nulo?} & \textbf{Descrição} \\ \hline
+\endhead
+\texttt{id} & BIGINT & PK & Não & Identificador do registro \\ \hline
+\texttt{pedido\_id} & BIGINT & FK & Não & Pedido (ref. pedido) \\ \hline
+\texttt{status\_anterior} & status\_pedido & -- & Sim & Status antes da mudança (nulo na criação) \\ \hline
+\texttt{status\_novo} & status\_pedido & -- & Não & Status após a mudança \\ \hline
+\texttt{alterado\_por} & BIGINT & FK & Sim & Usuário responsável (ref. usuario) \\ \hline
+\texttt{alterado\_em} & TIMESTAMPTZ & -- & Não & Data/hora da mudança \\ \hline
+\end{longtable}
+\endgroup

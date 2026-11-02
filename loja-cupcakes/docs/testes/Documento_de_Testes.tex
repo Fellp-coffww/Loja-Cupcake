@@ -1,0 +1,240 @@
+\documentclass[12pt]{article}
+
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage[table]{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+
+\geometry{a4paper, left=3cm, top=3cm, right=2cm, bottom=2cm}
+\definecolor{rosa}{HTML}{D6336C}
+\hypersetup{colorlinks=true, linkcolor=rosa, urlcolor=rosa}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newtcolorbox{dica}[1][Atenção]{colback=rosa!6, colframe=rosa, title=#1, fonttitle=\bfseries, boxrule=0.6pt}
+
+\begin{document}
+\begin{titlepage}
+    \centering
+    \textsc{\Large Universidade Cruzeiro do Sul}\\[0.5cm]
+    \textsc{\Large Engenharia de Software}\\[0.5cm]
+    \textsc{Projeto Integrador Transdisciplinar II}
+    \vspace{2.5cm}
+
+    \hrule \vspace{0.4cm}
+    {\huge \bfseries Documento de Testes\\[0.3cm] Loja Virtual de Cupcakes}\\[0.4cm]
+    \hrule
+    \vspace{3cm}
+
+    \begin{flushleft}
+        \Large \emph{Aluno:}\\
+        Fellipe Augusto Gonçalves Magalhães
+    \end{flushleft}
+    \vfill
+    {\large Novembro de 2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ---------------------------------------------------------------- 1
+\section{Introdução}
+
+Este documento descreve os testes automatizados do sistema \textbf{Loja Virtual de Cupcakes}, os resultados obtidos, os defeitos encontrados e corrigidos e a rastreabilidade entre os testes e as histórias de usuário (US01 a US15) e regras de negócio (RN01 a RN15) definidas no Projeto Integrador I.
+
+O objetivo é demonstrar, de forma repetível, que o comportamento esperado foi realizado. Os testes cobrem a \textbf{verificação} (o sistema foi construído conforme a especificação) e preparam a \textbf{validação} com usuários, etapa seguinte do projeto (seção~\ref{sec:limites}).
+
+\begin{table}[H]
+\centering\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{6cm}|p{7.4cm}|}
+\hline
+\rowcolor{gray!30} \textbf{Indicador} & \textbf{Resultado} \\ \hline
+Testes automatizados de back-end e banco (JUnit 5) & \input{n_backend.tex} casos, todos aprovados \\ \hline
+Testes automatizados de interface (Playwright) & \input{n_ui.tex} casos, todos aprovados \\ \hline
+Histórias de usuário com ao menos um teste & 15 de 15 \\ \hline
+Regras de negócio com ao menos um teste & 15 de 15 \\ \hline
+Defeitos encontrados e corrigidos & 2 (seção~\ref{sec:defeitos}) \\ \hline
+\end{tabular}
+\caption{Resumo geral}
+\end{table}
+
+% ---------------------------------------------------------------- 2
+\section{Estratégia de testes}
+
+Os testes seguem uma pirâmide: muitos testes rápidos nas camadas internas e menos testes, mais amplos, nas camadas externas.
+
+\begin{table}[H]
+\centering\small\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{3.3cm}|p{5.3cm}|p{5.3cm}|}
+\hline
+\rowcolor{gray!30} \textbf{Nível} & \textbf{O que verifica} & \textbf{Como} \\ \hline
+Unitário & Funções isoladas: conversão JSON, hash de senha, sessões & JUnit 5, sem banco \\ \hline
+Integração (DAO + banco) & Cada consulta e transação do Model contra o PostgreSQL real & JUnit 5; o banco é recriado antes de cada teste \\ \hline
+Banco de dados & Restrições, índices únicos, triggers, views e permissões & JUnit 5 com SQL direto \\ \hline
+Ponta a ponta (API) & Rotas HTTP, perfis, validações e fluxos completos (Controller + DAO + banco) & JUnit 5 sobe o servidor em uma porta livre e faz requisições HTTP \\ \hline
+Interface (View) & Telas, mensagens e navegação no navegador & Playwright (Chromium), simulando o usuário \\ \hline
+\end{tabular}
+\caption{Níveis de teste}
+\end{table}
+
+\textbf{Critérios adotados em cada caso:} um caso de teste verifica um comportamento esperado e tem resultado objetivo (aprovado ou reprovado). Cada caso traz a indicação da história (USxx) e da regra de negócio (RNxx) a que se refere. Os casos incluem o caminho feliz, as entradas inválidas e os limites (por exemplo, quantidade 0, 1 e 100).
+
+\textbf{Isolamento:} antes de cada teste de back-end, o esquema do banco de testes é apagado e recriado pelo mesmo script SQL do projeto, com os dados iniciais. Assim, nenhum teste depende do resultado de outro, e o próprio script de criação do banco é exercitado a cada execução.
+
+% ---------------------------------------------------------------- 3
+\section{Ambiente e como executar}
+
+\subsection{Ambiente usado}
+
+\begin{itemize}
+\item Java 21 (exige-se JDK 17 ou superior), JUnit 5 em modo console (\texttt{junit-platform-console-standalone}), driver JDBC PostgreSQL 42.7.2.
+\item PostgreSQL 16, em um banco separado do banco de uso (\texttt{loja\_cupcakes\_test}).
+\item Interface: Python 3, Playwright e Chromium.
+\end{itemize}
+
+\begin{dica}[Proteção do banco]
+Os testes apagam e recriam o esquema \texttt{loja}. Por segurança, só rodam se o nome do banco contiver ``test''; caso contrário, o teste aborta antes de tocar em qualquer dado.
+\end{dica}
+
+\subsection{Executar os testes de back-end}
+
+\begin{enumerate}
+\item Crie o banco de testes (com o container do banco já ligado):
+\begin{Verbatim}[fontsize=\footnotesize, frame=single]
+docker exec -it loja-db psql -U postgres -c "CREATE DATABASE loja_cupcakes_test"
+\end{Verbatim}
+\item Na pasta do projeto, rode (\texttt{testar.sh} no Linux/Mac):
+\begin{Verbatim}[fontsize=\footnotesize, frame=single]
+testar.bat
+\end{Verbatim}
+\end{enumerate}
+
+O script compila o sistema e os testes e executa tudo. O relatório em XML fica na pasta \texttt{relatorios}. Se o banco usar outra senha ou porta, defina \texttt{TEST\_DB\_URL}, \texttt{TEST\_DB\_USER} e \texttt{TEST\_DB\_PASSWORD}.
+
+\subsection{Executar os testes de interface}
+
+\begin{enumerate}
+\item Instale uma vez: \texttt{pip install playwright} e \texttt{playwright install chromium}.
+\item Recrie o banco de testes com os dados iniciais e suba o sistema apontando para ele (\texttt{DB\_URL} com o banco \texttt{loja\_cupcakes\_test}).
+\item Rode: \texttt{python testes/interface/testar\_interface.py http://localhost:8080}.
+\end{enumerate}
+
+O script grava \texttt{relatorios/interface.json} e salva uma imagem da tela de cada teste reprovado.
+
+% ---------------------------------------------------------------- 4
+\section{Resultados}
+
+\subsection{Back-end e banco de dados}
+
+\input{resumo_classes.tex}
+
+Saída resumida do JUnit na última execução (todos os casos aprovados, tempo total de cerca de \input{t_backend.tex} segundos):
+
+\begin{Verbatim}[fontsize=\footnotesize, frame=single]
+Test run finished after 24683 ms
+[ 11 containers found      ]
+[ 0 containers skipped    ]
+[ 11 containers started    ]
+[ 0 containers aborted    ]
+[ 11 containers successful ]
+[ 0 containers failed     ]
+[ 131 tests found           ]
+[ 0 tests skipped         ]
+[ 131 tests started         ]
+[ 0 tests aborted         ]
+[ 131 tests successful      ]
+[ 0 tests failed          ]
+\end{Verbatim}
+
+\subsection{Interface}
+
+Os \input{n_ui.tex} casos de interface foram executados em um navegador Chromium automatizado, contra o sistema real e o banco de testes, e todos foram aprovados. Eles cobrem: tela inicial só com login, cadastro e login, vitrine e filtro, detalhes, carrinho na aba lateral, finalização do pedido, pagamento recusado e aprovado, Meus pedidos, painel do dono (dashboard, status, cadastro e edição de produto) e proteção contra HTML malicioso no nome de produto. A lista completa está no Apêndice B.
+
+Para garantir que a verificação detecta erros, foi feito um controle negativo: uma checagem propositalmente falsa (esperar a loja visível antes do login) foi reprovada pelo mesmo mecanismo.
+
+% ---------------------------------------------------------------- 5
+\section{Defeitos encontrados e corrigidos}
+\label{sec:defeitos}
+
+\begin{table}[H]
+\centering\small\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{4.0cm}|p{3.5cm}|p{3.5cm}|}
+\hline
+\rowcolor{gray!30} \textbf{ID} & \textbf{Defeito} & \textbf{Correção} & \textbf{Teste de regressão} \\ \hline
+D1 & Enviar um JSON cortado (por exemplo, \texttt{\{"email":}) fazia o servidor responder erro 500 (``Erro interno'') em vez de erro 400, porque o leitor lançava \texttt{String\-Index\-Out\-Of\-Bounds\-Exception} & \texttt{Json.\-lerObjeto} passou a converter o erro de leitura em \texttt{Illegal\-Argument\-Exception}, que a API responde com 400 & \texttt{Json\-Test}: JSON malformado; \texttt{Api\-Test}: JSON malformado devolve 400 \\ \hline
+D2 & Enviar número decimal em campo inteiro (por exemplo, quantidade 1,5) gerava \texttt{Arithmetic\-Exception} e erro 500 & \texttt{Json.longo} passou a lançar \texttt{Illegal\-Argument\-Exception} com a mensagem ``O campo ... deve ser um número inteiro'' & \texttt{Json\-Test}: decimal em inteiro; \texttt{Api\-Test}: quantidade inválida (1,5) \\ \hline
+\end{tabular}
+\caption{Defeitos encontrados nos testes}
+\end{table}
+
+O D1 foi detectado pela execução dos testes (quatro casos reprovaram na primeira execução; dois deles eram erros na escrita dos próprios testes, que usavam um leitor de JSON que não lê listas, e foram ajustados). O D2 foi identificado na análise do mesmo trecho de código e recebeu testes de regressão antes da última execução completa. Após as correções, todos os casos foram aprovados.
+
+% ---------------------------------------------------------------- 6
+\section{Rastreabilidade}
+
+\subsection{Histórias de usuário}
+
+A tabela mostra quantos casos de teste referenciam cada história. Um caso pode referenciar mais de uma.
+
+\input{rastreabilidade.tex}
+
+\begin{dica}[Histórias parcialmente implementadas]
+Alguns pontos do planejamento não estão implementados (por exemplo, seletor de quantidade no carrinho, consulta de CEP no ViaCEP, \textit{webhook} do gateway e gráficos do dashboard). Os testes verificam o comportamento que existe hoje; esses pontos estão listados no capítulo de implementação do documento do projeto e entram nos testes quando forem implementados.
+\end{dica}
+
+\subsection{Regras de negócio}
+
+\input{regras.tex}
+
+% ---------------------------------------------------------------- 7
+\section{Requisitos não funcionais}
+
+\begin{table}[H]
+\centering\small\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{4.6cm}|p{6.2cm}|}
+\hline
+\rowcolor{gray!30} \textbf{ID} & \textbf{Requisito} & \textbf{Situação nos testes} \\ \hline
+RNF01, RNF02 & Vitrine em menos de 2 s e filtro em menos de 1 s & Verificado: ambos respondem em menos de 1 s (teste de desempenho da API) \\ \hline
+RNF03 & Interface responsiva & Não verificado automaticamente (a interface usa grade flexível; falta teste em celular) \\ \hline
+RNF04 & Persistência do carrinho & Verificado: o carrinho fica no banco (testes do carrinho e recarregamento da página) \\ \hline
+RNF08, RNF12 & Segurança & Verificado: perfis (401 e 403), hash de senha, permissões do banco, escape de HTML \\ \hline
+RNF09, RNF13 & Consistência e integridade & Verificado: transação do pedido, restrições e chaves do banco \\ \hline
+RNF05, RNF06, RNF11, RNF14 & Atualização instantânea e tempo real & Parcial: o carrinho atualiza na hora; o status dos pedidos usa consulta periódica \\ \hline
+RNF10, RNF15 & Disponibilidade e desempenho do dashboard & Não verificado (exigiria teste de carga) \\ \hline
+\end{tabular}
+\caption{Requisitos não funcionais e verificação}
+\end{table}
+
+% ---------------------------------------------------------------- 8
+\section{Limites desta etapa e próximos passos}
+\label{sec:limites}
+
+\begin{itemize}
+\item \textbf{Validação com usuários:} os testes automatizados verificam a especificação. Falta a rodada de testes com cinco colegas ou profissionais, com formulário de bugs e sugestões, prevista na Situação 3 do projeto.
+\item \textbf{Não coberto:} teste de carga e concorrência (por exemplo, dois clientes comprando a última unidade ao mesmo tempo), compatibilidade com outros navegadores (a interface foi testada em Chromium), acessibilidade, uso em celular e testes de invasão.
+\item \textbf{Gateway de pagamento:} é simulado; o comportamento com um gateway real e com \textit{webhook} ainda não foi testado.
+\item \textbf{Cancelamento:} cancelar um pedido não devolve as unidades ao estoque (limitação conhecida, documentada no manual de uso).
+\item \textbf{Cobertura de código:} não foi medida com ferramenta; a cobertura é demonstrada pela rastreabilidade entre testes, histórias e regras.
+\end{itemize}
+
+\newpage
+\appendix
+\section{Casos de teste de back-end e banco de dados}
+
+Legenda: \textbf{Refere-se a} indica a história (US), a regra de negócio (RN), o requisito não funcional (RNF) ou o tema (ACESSO, ESQUEMA, UTIL, ROBUSTEZ, VIEW) que o caso verifica.
+
+\input{casos_backend.tex}
+
+\newpage
+\section{Casos de teste de interface}
+
+\input{casos_interface.tex}
+
+\end{document}

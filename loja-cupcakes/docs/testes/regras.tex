@@ -1,0 +1,20 @@
+\begin{longtable}{|c|c|p{9.4cm}|}
+\hline
+\rowcolor{gray!30} \textbf{Regra} & \textbf{Casos} & \textbf{Verificada por (exemplos)} \\ \hline
+\endhead
+RN01 & 2 & \small Produto inativo não aparece na vitrine da API; Vitrine lista somente produtos ativos \\ \hline
+RN02 & 2 & \small Categoria inválida gera erro 400; Categoria inexistente retorna lista vazia \\ \hline
+RN03 & 2 & \small Dono edita preço e estoque (detalhes mostram o dado novo); desativar tira da vitrine; Editar produto altera preço, estoque e categorias (dado atualizado) \\ \hline
+RN04 & 2 & \small Quantidade fora de 1 a 99 é recusada com 400; Quantidade zero é rejeitada e nada é gravado \\ \hline
+RN05 & 1 & \small Quantidade negativa é rejeitada \\ \hline
+RN06 & 1 & \small Carrinho calcula subtotal por item \\ \hline
+RN07 & 4 & \small Endereço de outro cliente ou inexistente é recusado; CEP inválido e UF em minúsculas são rejeitados pelo banco \\ \hline
+RN08 & 2 & \small Forma de pagamento inválida é rejeitada e nada é gravado; Forma de pagamento inválida devolve 400 \\ \hline
+RN09 & 5 & \small Estoque insuficiente impede o pedido e nada é alterado; Sem carrinho aberto não é possível confirmar \\ \hline
+RN10 & 3 & \small Pagamento aprovado muda o pedido para PAGO; Pagamento processado precisa ter data de processamento \\ \hline
+RN11 & 2 & \small Status inexistente e pedido inexistente geram erro; Status inexistente, ausente ou pedido inexistente devolvem 400 \\ \hline
+RN12 & 3 & \small Nome de produto repetido é rejeitado; Cadastro recusa campos obrigatórios vazios, preço zero e nome repetido \\ \hline
+RN13 & 2 & \small Editar produto inexistente gera erro; Editar produto inexistente devolve 400 \\ \hline
+RN14 & 6 & \small Pedido entregue não pode mais mudar de status; Dono muda o status seguindo o fluxo e é barrado ao pular etapas \\ \hline
+RN15 & 1 & \small Vendas só contam pedidos já pagos e refletem o dado atual \\ \hline
+\end{longtable}

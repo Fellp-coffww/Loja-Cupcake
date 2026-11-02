@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loja de Cupcakes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== TELA 1: LOGIN (única tela visível ao abrir) ========== -->
+<div id="tela-login" class="oculto">
+  <div class="login-caixa">
+    <h1>🧁 Loja de Cupcakes</h1>
+    <div class="abas">
+      <button id="aba-entrar" class="aba ativa" onclick="trocarFormLogin('entrar')">Entrar</button>
+      <button id="aba-cadastro" class="aba" onclick="trocarFormLogin('cadastro')">Criar conta</button>
+    </div>
+
+    <form id="form-entrar" onsubmit="entrar(); return false;">
+      <input id="login-email" type="email" placeholder="E-mail" required>
+      <input id="login-senha" type="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+
+    <form id="form-cadastro" class="oculto" onsubmit="cadastrar(); return false;">
+      <input id="cad-nome" placeholder="Nome completo" required>
+      <input id="cad-email" type="email" placeholder="E-mail" required>
+      <input id="cad-senha" type="password" placeholder="Senha (mín. 6 caracteres)" required>
+      <input id="cad-tel" placeholder="Telefone (opcional, só números)">
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <div id="msg-login" class="msg"></div>
+    <small>Demonstração: maria@email.com / 123456</small>
+  </div>
+</div>
+
+<!-- ========== TELA 2: LOJA (aparece somente após o login) ========== -->
+<div id="tela-loja" class="oculto">
+  <header>
+    <h1>🧁 Loja de Cupcakes</h1>
+    <div class="barra">
+      <span id="ola"></span>
+      <button class="claro" onclick="abrirDrawer('carrinho')">🛒 Carrinho <span id="badge" class="badge">0</span></button>
+      <button class="claro" onclick="abrirDrawer('pedidos')">📦 Meus pedidos</button>
+      <button class="claro" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="sec-vitrine">
+      <h2>Vitrine</h2>
+      <div class="linha">
+        <label>Categoria:
+          <select id="filtro" onchange="carregarVitrine()"><option value="">Todas</option></select>
+        </label>
+      </div>
+      <div id="vitrine" class="grade"></div>
+      <div id="msg-vitrine" class="msg"></div>
+    </section>
+  </main>
+
+  <!-- Aba lateral: Carrinho | Meus pedidos -->
+  <div id="overlay" onclick="fecharDrawer()"></div>
+  <aside id="drawer" aria-label="Carrinho e pedidos">
+    <div class="drawer-topo">
+      <div class="abas">
+        <button id="aba-carrinho" class="aba ativa" onclick="trocarAba('carrinho')">🛒 Carrinho</button>
+        <button id="aba-pedidos" class="aba" onclick="trocarAba('pedidos')">📦 Meus pedidos</button>
+      </div>
+      <button class="sec fechar" onclick="fecharDrawer()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div id="painel-carrinho" class="drawer-corpo">
+      <div id="carrinho"></div>
+      <div id="msg-carrinho" class="msg"></div>
+    </div>
+    <div id="rodape-carrinho" class="drawer-rodape">
+      <div class="total-linha"><span>Total</span> <b id="total-carrinho">R$ 0,00</b></div>
+      <button id="btn-finalizar" onclick="abrirCheckout()" disabled>Finalizar pedido</button>
+    </div>
+
+    <div id="painel-pedidos" class="drawer-corpo oculto">
+      <div id="pedidos"></div>
+      <div id="msg-pedidos" class="msg"></div>
+    </div>
+  </aside>
+</div>
+
+<!-- Finalizar pedido: endereço + confirmação -->
+<dialog id="dlg-checkout">
+  <h3>Finalizar pedido</h3>
+  <div class="linha">
+    <label>Endereço de entrega:<br>
+      <select id="sel-endereco"></select>
+    </label>
+  </div>
+  <button class="sec" onclick="document.getElementById('form-end').classList.toggle('oculto')">+ Novo endereço</button>
+  <div id="form-end" class="oculto form-end">
+    <input id="e-cep" placeholder="CEP" size="9">
+    <input id="e-rua" placeholder="Rua">
+    <input id="e-num" placeholder="Nº" size="5">
+    <input id="e-comp" placeholder="Complemento">
+    <input id="e-bairro" placeholder="Bairro">
+    <input id="e-cidade" placeholder="Cidade">
+    <input id="e-uf" placeholder="UF" size="2" maxlength="2">
+    <button onclick="salvarEndereco()">Salvar endereço</button>
+  </div>
+  <p class="tag">Taxa de entrega: R$ 5,00</p>
+  <div class="linha">
+    <button onclick="confirmarPedido()">Confirmar pedido</button>
+    <button class="sec" onclick="document.getElementById('dlg-checkout').close()">Cancelar</button>
+  </div>
+  <div id="msg-checkout" class="msg"></div>
+</dialog>
+
+<dialog id="dlg-detalhe"></dialog>
+
+<dialog id="dlg-pagamento">
+  <h3>Pagamento do pedido <span id="pg-pedido"></span></h3>
+  <div class="linha">
+    <label><input type="radio" name="metodo" value="PIX" checked> PIX</label>
+    <label><input type="radio" name="metodo" value="CARTAO"> Cartão</label>
+  </div>
+  <label><input type="checkbox" id="pg-recusar"> Simular pagamento recusado (demonstração)</label>
+  <div class="linha">
+    <button onclick="pagar()">Pagar</button>
+    <button class="sec" onclick="document.getElementById('dlg-pagamento').close()">Fechar</button>
+  </div>
+  <div id="msg-pagamento" class="msg"></div>
+</dialog>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
