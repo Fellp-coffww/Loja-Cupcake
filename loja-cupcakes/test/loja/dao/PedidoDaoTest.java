@@ -102,10 +102,11 @@ class PedidoDaoTest {
 
     @Test @DisplayName("[US09, RN09] Estoque insuficiente impede o pedido e nada é alterado")
     void estoqueInsuficiente() throws Exception {
-        carrinho.adicionar(maria, idCupcake(LIMAO), 5);          // estoque = 4
+        carrinho.adicionar(maria, idCupcake(LIMAO), 3);          // estoque = 4
+        executar("UPDATE cupcake SET estoque = 2 WHERE nome = ?", LIMAO);   // outro cliente comprou antes
         SQLException e = assertThrows(SQLException.class, () -> pedidos.confirmar(maria, enderecoMaria, TAXA));
         assertTrue(e.getMessage().contains("estoque"));
-        assertEquals(4, contar("SELECT estoque FROM cupcake WHERE nome = ?", LIMAO));
+        assertEquals(2, contar("SELECT estoque FROM cupcake WHERE nome = ?", LIMAO));
         assertEquals("ABERTO", valor("SELECT status FROM carrinho WHERE cliente_id = ?", maria).toString());
         assertEquals(0, contar("SELECT count(*) FROM pedido"));
     }

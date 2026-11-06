@@ -5,12 +5,12 @@
 RN01 & 2 & \small Produto inativo não aparece na vitrine da API; Vitrine lista somente produtos ativos \\ \hline
 RN02 & 2 & \small Categoria inválida gera erro 400; Categoria inexistente retorna lista vazia \\ \hline
 RN03 & 2 & \small Dono edita preço e estoque (detalhes mostram o dado novo); desativar tira da vitrine; Editar produto altera preço, estoque e categorias (dado atualizado) \\ \hline
-RN04 & 2 & \small Quantidade fora de 1 a 99 é recusada com 400; Quantidade zero é rejeitada e nada é gravado \\ \hline
+RN04 & 4 & \small Quantidade fora de 1 a 99 é recusada com 400; Definir a quantidade de um item substitui o valor (D5) \\ \hline
 RN05 & 1 & \small Quantidade negativa é rejeitada \\ \hline
 RN06 & 1 & \small Carrinho calcula subtotal por item \\ \hline
 RN07 & 4 & \small Endereço de outro cliente ou inexistente é recusado; CEP inválido e UF em minúsculas são rejeitados pelo banco \\ \hline
 RN08 & 2 & \small Forma de pagamento inválida é rejeitada e nada é gravado; Forma de pagamento inválida devolve 400 \\ \hline
-RN09 & 5 & \small Estoque insuficiente impede o pedido e nada é alterado; Sem carrinho aberto não é possível confirmar \\ \hline
+RN09 & 11 & \small Produto esgotado não pode ser adicionado ao carrinho (D4); Quantidade acima do estoque é rejeitada, inclusive somada ao que já está no carrinho (D4) \\ \hline
 RN10 & 3 & \small Pagamento aprovado muda o pedido para PAGO; Pagamento processado precisa ter data de processamento \\ \hline
 RN11 & 2 & \small Status inexistente e pedido inexistente geram erro; Status inexistente, ausente ou pedido inexistente devolvem 400 \\ \hline
 RN12 & 3 & \small Nome de produto repetido é rejeitado; Cadastro recusa campos obrigatórios vazios, preço zero e nome repetido \\ \hline

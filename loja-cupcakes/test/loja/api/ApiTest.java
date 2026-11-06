@@ -177,6 +177,43 @@ class ApiTest {
         assertEquals(0, http.get("/api/carrinho", t).contar("\"cupcakeId\":"));
     }
 
+    @Test @DisplayName("[US04, RN09] API recusa produto esgotado e quantidade acima do estoque com 400 e mensagem clara (D4)")
+    void estoqueNoCarrinho() throws Exception {
+        String t = maria();
+        executar("UPDATE cupcake SET estoque = 0 WHERE nome = ?", MORANGO);
+        Resposta r = http.post("/api/carrinho/itens", "{\"cupcakeId\":" + idCupcake(MORANGO) + ",\"quantidade\":1}", t);
+        assertEquals(400, r.status());
+        assertTrue(r.corpo().toLowerCase().contains("esgotado"));
+        r = http.post("/api/carrinho/itens", "{\"cupcakeId\":" + idCupcake(LIMAO) + ",\"quantidade\":5}", t);   // estoque = 4
+        assertEquals(400, r.status());
+        assertTrue(r.corpo().contains("4"));
+        assertEquals(0, http.get("/api/carrinho", t).contar("\"cupcakeId\":"));
+    }
+
+    @Test @DisplayName("[US05, RN04, RN09] PUT define a quantidade do item; fora de 1 a 99 ou acima do estoque devolve 400 (D5)")
+    void alterarQuantidade() throws Exception {
+        String t = maria();
+        long id = idCupcake(BRIGADEIRO);
+        http.post("/api/carrinho/itens", "{\"cupcakeId\":" + id + ",\"quantidade\":2}", t);
+        Resposta r = http.put("/api/carrinho/itens/" + id, "{\"quantidade\":5}", t);
+        assertEquals(200, r.status());
+        assertEquals(0, new java.math.BigDecimal("47.50").compareTo(r.numero("total")));
+        assertEquals(400, http.put("/api/carrinho/itens/" + id, "{\"quantidade\":0}", t).status());
+        assertEquals(400, http.put("/api/carrinho/itens/" + id, "{\"quantidade\":100}", t).status());
+        assertEquals(400, http.put("/api/carrinho/itens/" + id, "{\"quantidade\":31}", t).status());   // estoque = 30
+        assertEquals(400, http.put("/api/carrinho/itens/" + idCupcake(VEGANO), "{\"quantidade\":1}", t).status());   // fora do carrinho
+        assertEquals(401, http.put("/api/carrinho/itens/" + id, "{\"quantidade\":1}", null).status());
+        assertEquals(0, new java.math.BigDecimal("47.50").compareTo(http.get("/api/carrinho", t).numero("total")));
+    }
+
+    @Test @DisplayName("[US01, RN09] Vitrine informa o estoque de cada produto para a interface marcar os esgotados (D4)")
+    void vitrineInformaEstoque() throws Exception {
+        executar("UPDATE cupcake SET estoque = 0 WHERE nome = ?", MORANGO);
+        Resposta r = http.get("/api/cupcakes", maria());
+        assertEquals(200, r.status());
+        assertTrue(r.corpo().contains("\"estoque\":0"));
+    }
+
     @Test @DisplayName("[US05] Remover item do carrinho atualiza o total")
     void removerItem() throws Exception {
         String t = maria();

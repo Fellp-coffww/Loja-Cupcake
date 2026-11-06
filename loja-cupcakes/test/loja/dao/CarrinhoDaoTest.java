@@ -105,4 +105,46 @@ class CarrinhoDaoTest {
     void vazio() throws Exception {
         assertTrue(dao.listar(maria).isEmpty());
     }
+
+    // ---- Correções da rodada de testes com colegas (laudo, defeitos D4 a D6) ----
+
+    @Test @DisplayName("[US04, RN09] Produto esgotado não pode ser adicionado ao carrinho (D4)")
+    void produtoEsgotado() throws Exception {
+        executar("UPDATE cupcake SET estoque = 0 WHERE nome = ?", MORANGO);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> dao.adicionar(maria, idCupcake(MORANGO), 1));
+        assertTrue(e.getMessage().toLowerCase().contains("esgotado"));
+        assertTrue(dao.listar(maria).isEmpty());
+    }
+
+    @Test @DisplayName("[US04, RN09] Quantidade acima do estoque é rejeitada, inclusive somada ao que já está no carrinho (D4)")
+    void acimaDoEstoque() throws Exception {
+        long limao = idCupcake(LIMAO);                       // estoque = 4
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> dao.adicionar(maria, limao, 5));
+        assertTrue(e.getMessage().contains("4"));
+        dao.adicionar(maria, limao, 3);
+        assertThrows(IllegalArgumentException.class, () -> dao.adicionar(maria, limao, 2));   // 3 + 2 > 4
+        assertEquals(3, dao.listar(maria).get(0).quantidade());
+        dao.adicionar(maria, limao, 1);                       // 3 + 1 = 4 (exatamente o estoque)
+        assertEquals(4, dao.listar(maria).get(0).quantidade());
+    }
+
+    @Test @DisplayName("[US05, RN04] Definir a quantidade de um item substitui o valor (D5)")
+    void definirQuantidade() throws Exception {
+        long id = idCupcake(BRIGADEIRO);
+        dao.adicionar(maria, id, 2);
+        dao.definirQuantidade(maria, id, 7);
+        assertEquals(7, dao.listar(maria).get(0).quantidade());
+        dao.definirQuantidade(maria, id, 1);
+        assertEquals(1, dao.listar(maria).get(0).quantidade());
+    }
+
+    @Test @DisplayName("[US05, RN09] Definir quantidade acima do estoque ou de item fora do carrinho é rejeitado (D5)")
+    void definirQuantidadeInvalida() throws Exception {
+        long limao = idCupcake(LIMAO);                       // estoque = 4
+        dao.adicionar(maria, limao, 2);
+        assertThrows(IllegalArgumentException.class, () -> dao.definirQuantidade(maria, limao, 5));
+        assertEquals(2, dao.listar(maria).get(0).quantidade());
+        assertThrows(IllegalArgumentException.class, () -> dao.definirQuantidade(maria, idCupcake(MORANGO), 1));
+    }
 }

@@ -67,6 +67,12 @@ async function carregarCategorias() {
   $('filtro').innerHTML = '<option value="">Todas</option>' + cats.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
 }
 
+function avisoEstoque(n) {
+  if (n <= 0) return '<span class="esgotado">Esgotado</span>';
+  if (n <= 5) return `<span class="poucos">Restam ${n}</span>`;
+  return '';
+}
+
 async function carregarVitrine() {
   const cat = $('filtro').value;
   try {
@@ -80,9 +86,13 @@ async function carregarVitrine() {
         <h3>${esc(c.nome)}</h3>
         <div class="tag">${esc(c.categorias)}</div>
         <p class="preco">${reais(c.preco)}</p>
+        ${avisoEstoque(c.estoque)}
         <div class="linha">
           <button class="sec" onclick="detalhes(${c.id})">Detalhes</button>
-          <button onclick="adicionar(${c.id})">Adicionar</button>
+          ${c.estoque > 0
+            ? `<input type="number" class="qtd" id="qtd-${c.id}" value="1" min="1" max="${Math.min(99, c.estoque)}" aria-label="Quantidade">
+               <button onclick="adicionar(${c.id}, 'qtd-${c.id}')">Adicionar</button>`
+            : '<button disabled>Esgotado</button>'}
         </div>
       </div>`).join('');
   } catch (e) { aviso('msg-vitrine', e.message, 'erro'); }
@@ -97,20 +107,45 @@ async function detalhes(id) {
       <p>${esc(c.descricao)}</p>
       <p><b>Ingredientes:</b> ${esc(c.ingredientes || '—')}</p>
       <p class="preco">${reais(c.preco)}</p>
-      <div class="linha"><button onclick="adicionar(${c.id}); this.closest('dialog').close()">Adicionar ao carrinho</button>
+      ${avisoEstoque(c.estoque)}
+      <div class="linha">
+      ${c.estoque > 0
+        ? `<input type="number" class="qtd" id="qtd-det" value="1" min="1" max="${Math.min(99, c.estoque)}" aria-label="Quantidade">
+           <button onclick="adicionar(${c.id}, 'qtd-det', true)">Adicionar ao carrinho</button>`
+        : '<button disabled>Esgotado</button>'}
       <button class="sec" onclick="this.closest('dialog').close()">Fechar</button></div>`;
     d.showModal();
   } catch (e) { aviso('msg-vitrine', e.message, 'erro'); }
 }
 
 // ---------- Carrinho (US04, US05, US06) ----------
-async function adicionar(id) {
+async function adicionar(id, campoQtd, fechar) {
+  const campo = campoQtd ? $(campoQtd) : null;
+  const qtd = campo ? parseInt(campo.value, 10) : 1;
+  if (!Number.isInteger(qtd) || qtd < 1 || qtd > 99) { aviso('msg-vitrine', 'Informe uma quantidade de 1 a 99', 'erro'); return; }
   try {
-    await api('POST', '/api/carrinho/itens', { cupcakeId: id, quantidade: 1 });
-    aviso('msg-vitrine', 'Item adicionado ao carrinho', 'ok');
+    await api('POST', '/api/carrinho/itens', { cupcakeId: id, quantidade: qtd });
+    if (fechar && campo) campo.closest('dialog').close();
+    aviso('msg-vitrine', qtd + (qtd === 1 ? ' item adicionado' : ' itens adicionados') + ' ao carrinho', 'ok');
     setTimeout(() => aviso('msg-vitrine', ''), 2500);
+    if (campo) campo.value = 1;
     carregarCarrinho();
-  } catch (e) { aviso('msg-vitrine', e.message, 'erro'); }
+  } catch (e) {
+    if (fechar && campo) campo.closest('dialog').close();
+    aviso('msg-vitrine', e.message, 'erro');
+    carregarVitrine();   // o estoque pode ter mudado: atualiza os cartões
+  }
+}
+
+// Seletor de quantidade dentro do carrinho (US05)
+async function alterarQtd(id, qtd) {
+  qtd = parseInt(qtd, 10);
+  if (!Number.isInteger(qtd) || qtd < 1) { carregarCarrinho(); return; }
+  try {
+    await api('PUT', '/api/carrinho/itens/' + id, { quantidade: qtd });
+    aviso('msg-carrinho', '');
+  } catch (e) { aviso('msg-carrinho', e.message, 'erro'); }
+  carregarCarrinho();
 }
 
 async function remover(id) {
@@ -129,7 +164,13 @@ async function carregarCarrinho() {
     $('carrinho').innerHTML = c.itens.length
       ? c.itens.map(i => `
         <div class="item-carrinho">
-          <div><b>${esc(i.nome)}</b><br><small>${i.quantidade} x ${reais(i.preco)} = ${reais(i.subtotal)}</small></div>
+          <div><b>${esc(i.nome)}</b><br><small>${reais(i.preco)} cada · subtotal ${reais(i.subtotal)}</small>
+            <div class="seletor">
+              <button class="sec" aria-label="Diminuir" onclick="alterarQtd(${i.cupcakeId}, ${i.quantidade - 1})" ${i.quantidade <= 1 ? 'disabled' : ''}>−</button>
+              <input type="number" class="qtd" id="qtd-item-${i.cupcakeId}" value="${i.quantidade}" min="1" max="99"
+                     onchange="alterarQtd(${i.cupcakeId}, this.value)" aria-label="Quantidade de ${esc(i.nome)}">
+              <button class="sec" aria-label="Aumentar" onclick="alterarQtd(${i.cupcakeId}, ${i.quantidade + 1})">+</button>
+            </div></div>
           <button class="sec" onclick="remover(${i.cupcakeId})">Remover</button>
         </div>`).join('')
       : '<p>Seu carrinho está vazio.</p>';

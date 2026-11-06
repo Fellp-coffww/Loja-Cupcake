@@ -306,6 +306,95 @@ with sync_playwright() as p:
         assert cliente.locator(".card img[src='x']").count() == 0
         pagina_atual[0] = pg
 
+
+    # ---------------------------------------- correções da rodada de testes com colegas (D4, D5, D6)
+    def editar_estoque(nome, valor):
+        pg.reload(); pg.wait_for_selector("#produtos tr")
+        pg.locator("#produtos tr", has_text=nome).locator("text=Editar").click()
+        pg.fill("#p-estoque", str(valor))
+        pg.click("#painel >> text=Salvar")
+        expect(pg.locator("#msg-produto")).to_contain_text("salvo")
+
+    def cartao(pagina, nome):
+        return pagina.locator(".card", has_text=nome)
+
+    @teste("UI32", "US04, RN09", "Produto esgotado aparece com a marca \"Esgotado\" e o botão de compra desabilitado (D4)")
+    def _():
+        editar_estoque("Baunilha", 0)
+        c = nova_pagina(browser)
+        login(c, "joao@email.com")
+        card = cartao(c, "Baunilha")
+        expect(card).to_contain_text("Esgotado")
+        expect(card.get_by_role("button", name="Esgotado")).to_be_disabled()
+        expect(card.locator("input.qtd")).to_have_count(0)
+        expect(cartao(c, "Brigadeiro").locator("input.qtd")).to_have_count(1)   # os demais continuam à venda
+        globals()["cliente2"] = c
+
+    @teste("UI33", "US04", "Escolher a quantidade na vitrine adiciona várias unidades de uma vez (D5)")
+    def _():
+        c = globals()["cliente2"]; pagina_atual[0] = c
+        card = cartao(c, "Brigadeiro")
+        card.locator("input.qtd").fill("3")
+        card.get_by_role("button", name="Adicionar", exact=True).click()
+        expect(c.locator("#msg-vitrine")).to_contain_text("3 itens adicionados")
+        expect(c.locator("#badge")).to_have_text("3")
+        c.click("text=🛒 Carrinho"); c.wait_for_timeout(400)
+        expect(c.locator("#carrinho input.qtd")).to_have_value("3")
+
+    @teste("UI34", "US05", "No carrinho, os botões + e − e o campo numérico alteram a quantidade e o total (D5)")
+    def _():
+        c = globals()["cliente2"]; pagina_atual[0] = c
+        c.get_by_label("Aumentar").click()
+        expect(c.locator("#carrinho input.qtd")).to_have_value("4")
+        expect(c.locator("#badge")).to_have_text("4")
+        expect(c.locator("#total-carrinho")).to_contain_text("38,00")      # 4 x 9,50
+        c.get_by_label("Diminuir").click()
+        expect(c.locator("#carrinho input.qtd")).to_have_value("3")
+        c.locator("#carrinho input.qtd").fill("5"); c.locator("#carrinho input.qtd").press("Tab")
+        expect(c.locator("#total-carrinho")).to_contain_text("47,50")      # 5 x 9,50
+        expect(c.locator("#badge")).to_have_text("5")
+
+    @teste("UI35", "RN09", "Quantidade acima do estoque no carrinho é recusada com mensagem clara e o valor volta ao anterior (D4)")
+    def _():
+        c = globals()["cliente2"]; pagina_atual[0] = c
+        c.locator("#carrinho input.qtd").fill("99"); c.locator("#carrinho input.qtd").press("Tab")
+        expect(c.locator("#msg-carrinho")).to_contain_text("Estoque insuficiente")
+        expect(c.locator("#carrinho input.qtd")).to_have_value("5")
+        expect(c.locator("#badge")).to_have_text("5")
+
+    @teste("UI36", "US04, RN09", "Adicionar mais do que o estoque pela vitrine mostra o erro e mantém o carrinho (D4)")
+    def _():
+        c = globals()["cliente2"]; pagina_atual[0] = c
+        fechar_drawer(c)
+        card = cartao(c, "Limão")                       # estoque = 24 (reposto em UI30)
+        card.locator("input.qtd").fill("30")
+        card.get_by_role("button", name="Adicionar", exact=True).click()
+        expect(c.locator("#msg-vitrine")).to_contain_text("Estoque insuficiente")
+        expect(c.locator("#badge")).to_have_text("5")
+
+    @teste("UI37", "US15", "Dashboard do dono atualiza sozinho, sem recarregar a página (D6)")
+    def _():
+        adm = browser.new_context(viewport={"width": 1100, "height": 800}).new_page()
+        pagina_atual[0] = adm
+        adm.add_init_script("window.INTERVALO_DASHBOARD_MS = 1000;")   # no uso normal são 10 s
+        login(adm, "admin@cupcakes.com")
+        adm.wait_for_url("**/admin.html")
+        adm.wait_for_selector("#dashboard table")
+        expect(adm.locator("#dash-atualizado")).to_contain_text("Atualizado às")
+        expect(adm.locator("#dashboard tr", has_text="Morango")).to_contain_text("OK")
+        pagina_atual[0] = pg
+        editar_estoque("Morango", 3)                     # outra sessão do dono altera o estoque
+        pagina_atual[0] = adm
+        expect(adm.locator("#dashboard tr", has_text="Morango")).to_contain_text("BAIXO", timeout=8000)
+
+    @teste("UI38", "US15", "Botão \"Atualizar agora\" recarrega o dashboard sob demanda")
+    def _():
+        pg.reload(); pg.wait_for_selector("#dashboard table")
+        antes = pg.locator("#dash-atualizado").inner_text()
+        pg.wait_for_timeout(1100)
+        pg.click("#btn-atualizar-dash")
+        pg.wait_for_function("t => document.getElementById('dash-atualizado').innerText !== t", arg=antes)
+
     browser.close()
 
 total = len(resultados)

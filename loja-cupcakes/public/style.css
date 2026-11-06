@@ -71,3 +71,11 @@ button:disabled { background:#ccc; cursor:not-allowed; }
 .form-end { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
 dialog { padding:18px; }
 dialog select { max-width:100%; }
+
+/* Quantidade e estoque (correções da rodada de testes) */
+input.qtd { width:64px; padding:6px; text-align:center; }
+.seletor { display:flex; align-items:center; gap:6px; margin-top:6px; }
+.seletor button { padding:4px 10px; }
+.seletor button:disabled, button:disabled { opacity:.5; cursor:not-allowed; }
+.esgotado { background:#fa5252; color:#fff; font-size:.75rem; padding:2px 8px; border-radius:4px; }
+.poucos { background:#ffe066; font-size:.75rem; padding:2px 8px; border-radius:4px; }

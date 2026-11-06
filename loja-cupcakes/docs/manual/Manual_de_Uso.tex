@@ -203,11 +203,11 @@ Clique em \botao{Detalhes} para ver a descrição completa, os ingredientes e o 
 
 \subsection{Carrinho}
 
-Clique em \botao{Adicionar} para colocar um cupcake no carrinho. Aparece o aviso ``Item adicionado ao carrinho'' e o número ao lado de \botao{Carrinho} no topo da página aumenta. Clicar de novo no mesmo produto soma mais uma unidade.
+Escolha a quantidade no campo ao lado do botão e clique em \botao{Adicionar} para colocar o cupcake no carrinho. Aparece o aviso ``itens adicionados ao carrinho'' e o número ao lado de \botao{Carrinho} no topo da página aumenta. Adicionar de novo o mesmo produto soma à quantidade que já está no carrinho. Produtos sem estoque aparecem com a marca \textbf{Esgotado} e o botão desabilitado; quando restam 5 unidades ou menos, o cartão mostra ``Restam N''. Se a quantidade pedida (somada à do carrinho) passar do estoque, o sistema mostra a mensagem ``Estoque insuficiente'' e não altera o carrinho.
 
 \figura{06_adicionado.png}{Aviso de item adicionado e contador do carrinho}{0.95}
 
-Para ver o carrinho, clique em \botao{Carrinho} no topo. Ele abre como uma \textbf{aba lateral}, à direita da tela, com os itens, as quantidades, o subtotal de cada um e o total. Para tirar um produto, clique em \botao{Remover}. Para fechar a aba, clique no \botao{X} ou em qualquer ponto fora dela.
+Para ver o carrinho, clique em \botao{Carrinho} no topo. Ele abre como uma \textbf{aba lateral}, à direita da tela, com os itens, o subtotal de cada um e o total. Para mudar a quantidade de um item, use os botões \botao{+} e \botao{−} ou digite o número no campo; o total é recalculado na hora. Para tirar um produto, clique em \botao{Remover}. Para fechar a aba, clique no \botao{X} ou em qualquer ponto fora dela.
 
 \figura{07_carrinho.png}{Aba lateral do carrinho com o botão Finalizar pedido}{0.95}
 
@@ -288,6 +288,8 @@ No topo do painel ficam três tabelas:
 \item \textbf{Mais vendidos:} unidades vendidas e receita por produto.
 \item \textbf{Estoque:} unidades de cada produto e sua situação: \textbf{OK}, \textbf{BAIXO} (5 unidades ou menos) ou \textbf{ESGOTADO}.
 \end{itemize}
+
+O dashboard se atualiza sozinho a cada 10 segundos (a página mostra o horário da última atualização). Para atualizar na hora, clique em \botao{Atualizar agora}.
 
 \figura{14_dashboard.png}{Dashboard de vendas}{0.95}
 
@@ -373,7 +375,6 @@ Porta 8080 em uso & Defina outra porta com \texttt{set PORT=8081} e abra \texttt
 \begin{itemize}
 \item O pagamento é simulado, sem integração com um gateway real.
 \item O endereço é digitado pelo cliente; não há consulta automática de CEP.
-\item O botão Adicionar insere uma unidade por clique; a quantidade final se ajusta clicando novamente.
 \item O painel do dono mostra o dashboard em tabelas, sem gráficos.
 \item O status do pedido é atualizado por consulta periódica (15 segundos), e não em tempo real.
 \item Cancelar um pedido não devolve as unidades ao estoque; ajuste o estoque manualmente (seção 5.6).

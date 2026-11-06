@@ -138,18 +138,18 @@ O script grava \texttt{relatorios/interface.json} e salva uma imagem da tela de 
 Saída resumida do JUnit na última execução (todos os casos aprovados, tempo total de cerca de \input{t_backend.tex} segundos):
 
 \begin{Verbatim}[fontsize=\footnotesize, frame=single]
-Test run finished after 24683 ms
+Test run finished after 20596 ms
 [ 11 containers found      ]
 [ 0 containers skipped    ]
 [ 11 containers started    ]
 [ 0 containers aborted    ]
 [ 11 containers successful ]
 [ 0 containers failed     ]
-[ 131 tests found           ]
+[ 138 tests found           ]
 [ 0 tests skipped         ]
-[ 131 tests started         ]
+[ 138 tests started         ]
 [ 0 tests aborted         ]
-[ 131 tests successful      ]
+[ 138 tests successful      ]
 [ 0 tests failed          ]
 \end{Verbatim}
 
@@ -170,11 +170,15 @@ Para garantir que a verificação detecta erros, foi feito um controle negativo:
 \rowcolor{gray!30} \textbf{ID} & \textbf{Defeito} & \textbf{Correção} & \textbf{Teste de regressão} \\ \hline
 D1 & Enviar um JSON cortado (por exemplo, \texttt{\{"email":}) fazia o servidor responder erro 500 (``Erro interno'') em vez de erro 400, porque o leitor lançava \texttt{String\-Index\-Out\-Of\-Bounds\-Exception} & \texttt{Json.\-lerObjeto} passou a converter o erro de leitura em \texttt{Illegal\-Argument\-Exception}, que a API responde com 400 & \texttt{Json\-Test}: JSON malformado; \texttt{Api\-Test}: JSON malformado devolve 400 \\ \hline
 D2 & Enviar número decimal em campo inteiro (por exemplo, quantidade 1,5) gerava \texttt{Arithmetic\-Exception} e erro 500 & \texttt{Json.longo} passou a lançar \texttt{Illegal\-Argument\-Exception} com a mensagem ``O campo ... deve ser um número inteiro'' & \texttt{Json\-Test}: decimal em inteiro; \texttt{Api\-Test}: quantidade inválida (1,5) \\ \hline
+D3 & A tela de login continuava visível depois do acesso, porque o estilo \texttt{\#tela-login \{ display:flex \}} anulava a classe que a oculta & Regra \texttt{.oculto \{ display:none !important \}} em \texttt{style.css} & Caso de interface UI01 (tela inicial só com o login) \\ \hline
+D4 & (Colegas G. Siqueira e E. Peron) Produto com estoque zero e quantidade maior que o estoque podiam ser colocados no carrinho; o erro só aparecia no fechamento do pedido & \texttt{Carrinho\-Dao} recusa produto esgotado e quantidade (somada ao que já está no carrinho) acima do estoque, com mensagem clara; a vitrine marca ``Esgotado'' e desabilita o botão & \texttt{Carrinho\-Dao\-Test}: esgotado, acima do estoque; \texttt{Api\-Test}: 400 com mensagem, estoque na vitrine; UI32, UI35 e UI36 \\ \hline
+D5 & (Colega E. Peron) Não era possível escolher a quantidade de uma vez: era preciso adicionar uma unidade por clique & Campo de quantidade na vitrine e nos detalhes; no carrinho, botões + e − e campo numérico (nova rota \texttt{PUT /api/carrinho/itens/\{id\}}) & \texttt{Carrinho\-Dao\-Test}: definir quantidade; \texttt{Api\-Test}: PUT; UI33 e UI34 \\ \hline
+D6 & (Colega W. Spagnol) O dashboard do dono não atualizava sozinho & Atualização automática a cada 10 s (pausa com a aba oculta), horário da última atualização e botão ``Atualizar agora'' & UI37 e UI38 \\ \hline
 \end{tabular}
 \caption{Defeitos encontrados nos testes}
 \end{table}
 
-O D1 foi detectado pela execução dos testes (quatro casos reprovaram na primeira execução; dois deles eram erros na escrita dos próprios testes, que usavam um leitor de JSON que não lê listas, e foram ajustados). O D2 foi identificado na análise do mesmo trecho de código e recebeu testes de regressão antes da última execução completa. Após as correções, todos os casos foram aprovados.
+O D1 foi detectado pela execução dos testes (quatro casos reprovaram na primeira execução; dois deles eram erros na escrita dos próprios testes, que usavam um leitor de JSON que não lê listas, e foram ajustados). O D2 foi identificado na análise do mesmo trecho de código e recebeu testes de regressão antes da última execução completa. Após as correções, todos os casos foram aprovados. Os defeitos D4, D5 e D6 foram apontados pelos colegas na rodada de testes de 28/10 a 02/11/2026 (relato completo no laudo de qualidade entregue com o projeto); para cada um foi escrito primeiro o teste de regressão, que reprovou com o código antigo (por exemplo, a API respondia 200 ao adicionar um produto esgotado), e depois a correção.
 
 % ---------------------------------------------------------------- 6
 \section{Rastreabilidade}
@@ -186,7 +190,7 @@ A tabela mostra quantos casos de teste referenciam cada história. Um caso pode 
 \input{rastreabilidade.tex}
 
 \begin{dica}[Histórias parcialmente implementadas]
-Alguns pontos do planejamento não estão implementados (por exemplo, seletor de quantidade no carrinho, consulta de CEP no ViaCEP, \textit{webhook} do gateway e gráficos do dashboard). Os testes verificam o comportamento que existe hoje; esses pontos estão listados no capítulo de implementação do documento do projeto e entram nos testes quando forem implementados.
+Alguns pontos do planejamento não estão implementados (por exemplo, consulta de CEP no ViaCEP, \textit{webhook} do gateway e gráficos do dashboard). Os testes verificam o comportamento que existe hoje; esses pontos estão listados no capítulo de implementação do documento do projeto e entram nos testes quando forem implementados.
 \end{dica}
 
 \subsection{Regras de negócio}
@@ -217,7 +221,7 @@ RNF10, RNF15 & Disponibilidade e desempenho do dashboard & Não verificado (exig
 \label{sec:limites}
 
 \begin{itemize}
-\item \textbf{Validação com usuários:} os testes automatizados verificam a especificação. Falta a rodada de testes com cinco colegas ou profissionais, com formulário de bugs e sugestões, prevista na Situação 3 do projeto.
+\item \textbf{Validação com usuários:} os testes automatizados verificam a especificação. A rodada com cinco colegas foi feita entre 28/10 e 02/11/2026 e gerou os defeitos D4, D5 e D6, já corrigidos. Os colegas também apontaram que não existe recuperação de senha e que o pagamento é simulado; ambos continuam como limitação.
 \item \textbf{Não coberto:} teste de carga e concorrência (por exemplo, dois clientes comprando a última unidade ao mesmo tempo), compatibilidade com outros navegadores (a interface foi testada em Chromium), acessibilidade, uso em celular e testes de invasão.
 \item \textbf{Gateway de pagamento:} é simulado; o comportamento com um gateway real e com \textit{webhook} ainda não foi testado.
 \item \textbf{Cancelamento:} cancelar um pedido não devolve as unidades ao estoque (limitação conhecida, documentada no manual de uso).

@@ -67,6 +67,7 @@ Fluxo de uma requisição: navegador (View) → `fetch('/api/...')` → Controll
 | `POST /api/cadastro`, `POST /api/login`, `POST /api/logout` | público | acesso |
 | `GET /api/carrinho` | cliente | US06 |
 | `POST /api/carrinho/itens` `{cupcakeId, quantidade}` | cliente | US04 |
+| `PUT /api/carrinho/itens/{cupcakeId}` `{quantidade}` | cliente | US05 |
 | `DELETE /api/carrinho/itens/{cupcakeId}` | cliente | US05 |
 | `GET/POST /api/enderecos` | cliente | US07 |
 | `POST /api/pedidos` `{enderecoId}` | cliente | US09 |

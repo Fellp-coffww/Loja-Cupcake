@@ -69,23 +69,27 @@
 42 & US12, RN12 & Preço zero e estoque negativo são rejeitados pelo banco & \cellcolor{green!20}OK \\ \hline
 43 & US01, RN01 & Vitrine lista somente produtos ativos & \cellcolor{green!20}OK \\ \hline
 \end{longtable}\normalsize
-\subsection*{CarrinhoDaoTest --- Carrinho de compras (11 casos)}
+\subsection*{CarrinhoDaoTest --- Carrinho de compras (15 casos)}
 \footnotesize
 \begin{longtable}{|c|p{2.5cm}|p{8.4cm}|c|}
 \hline
 \rowcolor{gray!30} \textbf{N.º} & \textbf{Refere-se a} & \textbf{Caso de teste (comportamento esperado)} & \textbf{Result.} \\ \hline
 \endhead
 44 & US05 & Remover item que não está no carrinho não gera erro & \cellcolor{green!20}OK \\ \hline
-45 & US04 & Produto inexistente não pode ser adicionado & \cellcolor{green!20}OK \\ \hline
-46 & US04 & Adicionar item cria o carrinho aberto e grava a quantidade & \cellcolor{green!20}OK \\ \hline
-47 & US04 & Adicionar o mesmo produto de novo soma as quantidades & \cellcolor{green!20}OK \\ \hline
-48 & US06 & Carrinho de um cliente não aparece para outro & \cellcolor{green!20}OK \\ \hline
-49 & US06, RN06 & Carrinho calcula subtotal por item & \cellcolor{green!20}OK \\ \hline
-50 & US06 & Carrinho vazio retorna lista vazia & \cellcolor{green!20}OK \\ \hline
-51 & US04, RN05 & Quantidade negativa é rejeitada & \cellcolor{green!20}OK \\ \hline
-52 & US04, RN04 & Quantidade zero é rejeitada e nada é gravado & \cellcolor{green!20}OK \\ \hline
-53 & US05 & Remover item tira o produto e o total é recalculado & \cellcolor{green!20}OK \\ \hline
-54 & US04 & Produto inativo não pode ser adicionado & \cellcolor{green!20}OK \\ \hline
+45 & US04, RN09 & Produto esgotado não pode ser adicionado ao carrinho (D4) & \cellcolor{green!20}OK \\ \hline
+46 & US04 & Produto inexistente não pode ser adicionado & \cellcolor{green!20}OK \\ \hline
+47 & US04, RN09 & Quantidade acima do estoque é rejeitada, inclusive somada ao que já está no carrinho (D4) & \cellcolor{green!20}OK \\ \hline
+48 & US04 & Adicionar item cria o carrinho aberto e grava a quantidade & \cellcolor{green!20}OK \\ \hline
+49 & US05, RN09 & Definir quantidade acima do estoque ou de item fora do carrinho é rejeitado (D5) & \cellcolor{green!20}OK \\ \hline
+50 & US04 & Adicionar o mesmo produto de novo soma as quantidades & \cellcolor{green!20}OK \\ \hline
+51 & US06 & Carrinho de um cliente não aparece para outro & \cellcolor{green!20}OK \\ \hline
+52 & US06, RN06 & Carrinho calcula subtotal por item & \cellcolor{green!20}OK \\ \hline
+53 & US05, RN04 & Definir a quantidade de um item substitui o valor (D5) & \cellcolor{green!20}OK \\ \hline
+54 & US06 & Carrinho vazio retorna lista vazia & \cellcolor{green!20}OK \\ \hline
+55 & US04, RN05 & Quantidade negativa é rejeitada & \cellcolor{green!20}OK \\ \hline
+56 & US04, RN04 & Quantidade zero é rejeitada e nada é gravado & \cellcolor{green!20}OK \\ \hline
+57 & US05 & Remover item tira o produto e o total é recalculado & \cellcolor{green!20}OK \\ \hline
+58 & US04 & Produto inativo não pode ser adicionado & \cellcolor{green!20}OK \\ \hline
 \end{longtable}\normalsize
 \subsection*{PedidoDaoTest --- Pedido, pagamento, status e dashboard (29 casos)}
 \footnotesize
@@ -93,35 +97,35 @@
 \hline
 \rowcolor{gray!30} \textbf{N.º} & \textbf{Refere-se a} & \textbf{Caso de teste (comportamento esperado)} & \textbf{Result.} \\ \hline
 \endhead
-55 & US14, RN11 & Status inexistente e pedido inexistente geram erro & \cellcolor{green!20}OK \\ \hline
-56 & US10 & Cliente não consegue pagar o pedido de outro cliente & \cellcolor{green!20}OK \\ \hline
-57 & US10 & Pagamento recusado mantém o pedido aguardando e permite nova tentativa & \cellcolor{green!20}OK \\ \hline
-58 & US11 & Pedido nasce com o status inicial registrado no histórico & \cellcolor{green!20}OK \\ \hline
-59 & US09 & Endereço de entrega é copiado para o pedido & \cellcolor{green!20}OK \\ \hline
-60 & US09, RN09 & Estoque insuficiente impede o pedido e nada é alterado & \cellcolor{green!20}OK \\ \hline
-61 & US09, RN09 & Sem carrinho aberto não é possível confirmar & \cellcolor{green!20}OK \\ \hline
-62 & US10, RN10 & Pagamento aprovado muda o pedido para PAGO & \cellcolor{green!20}OK \\ \hline
-63 & US15, RN15 & Vendas só contam pedidos já pagos e refletem o dado atual & \cellcolor{green!20}OK \\ \hline
-64 & US08, RN08 & Forma de pagamento inválida é rejeitada e nada é gravado & \cellcolor{green!20}OK \\ \hline
-65 & US09 & Confirmar cria pedido aguardando pagamento com total = itens + taxa & \cellcolor{green!20}OK \\ \hline
-66 & US09, RN07 & Endereço de outro cliente ou inexistente é recusado & \cellcolor{green!20}OK \\ \hline
-67 & US11 & Cliente vê apenas os seus pedidos, com status e pagamento & \cellcolor{green!20}OK \\ \hline
-68 & US09 & Depois de confirmar, o cliente pode montar um novo carrinho & \cellcolor{green!20}OK \\ \hline
-69 & US14, RN14 & Pedido entregue não pode mais mudar de status & \cellcolor{green!20}OK \\ \hline
-70 & US10 & Não é possível pagar um pedido que já foi pago & \cellcolor{green!20}OK \\ \hline
-71 & US09, RN09 & Carrinho vazio não gera pedido & \cellcolor{green!20}OK \\ \hline
-72 & US14 & Histórico guarda quem alterou o status & \cellcolor{green!20}OK \\ \hline
-73 & US09 & Preço do item fica gravado: mudar o preço depois não altera o pedido & \cellcolor{green!20}OK \\ \hline
-74 & US09, RN09 & Produto inativado depois de entrar no carrinho impede o pedido & \cellcolor{green!20}OK \\ \hline
-75 & US11 & Pedidos aparecem do mais novo para o mais antigo & \cellcolor{green!20}OK \\ \hline
-76 & US09 & Confirmar fecha o carrinho e esvazia a lista & \cellcolor{green!20}OK \\ \hline
-77 & US14, RN14 & Pedido pode ser cancelado enquanto aguarda pagamento & \cellcolor{green!20}OK \\ \hline
-78 & US09 & Confirmar baixa o estoque dos produtos & \cellcolor{green!20}OK \\ \hline
-79 & US15 & Pedido cancelado não entra nas vendas & \cellcolor{green!20}OK \\ \hline
-80 & US14, RN14 & Pular etapa do fluxo é rejeitado & \cellcolor{green!20}OK \\ \hline
-81 & US15 & Mais vendidos vem ordenado por unidades & \cellcolor{green!20}OK \\ \hline
-82 & US14, RN14 & Fluxo completo de status: PAGO, EM\_PREPARO, ENVIADO e ENTREGUE & \cellcolor{green!20}OK \\ \hline
-83 & US15 & Relatório de estoque classifica BAIXO, OK e ESGOTADO & \cellcolor{green!20}OK \\ \hline
+59 & US14, RN11 & Status inexistente e pedido inexistente geram erro & \cellcolor{green!20}OK \\ \hline
+60 & US10 & Cliente não consegue pagar o pedido de outro cliente & \cellcolor{green!20}OK \\ \hline
+61 & US10 & Pagamento recusado mantém o pedido aguardando e permite nova tentativa & \cellcolor{green!20}OK \\ \hline
+62 & US11 & Pedido nasce com o status inicial registrado no histórico & \cellcolor{green!20}OK \\ \hline
+63 & US09 & Endereço de entrega é copiado para o pedido & \cellcolor{green!20}OK \\ \hline
+64 & US09, RN09 & Estoque insuficiente impede o pedido e nada é alterado & \cellcolor{green!20}OK \\ \hline
+65 & US09, RN09 & Sem carrinho aberto não é possível confirmar & \cellcolor{green!20}OK \\ \hline
+66 & US10, RN10 & Pagamento aprovado muda o pedido para PAGO & \cellcolor{green!20}OK \\ \hline
+67 & US15, RN15 & Vendas só contam pedidos já pagos e refletem o dado atual & \cellcolor{green!20}OK \\ \hline
+68 & US08, RN08 & Forma de pagamento inválida é rejeitada e nada é gravado & \cellcolor{green!20}OK \\ \hline
+69 & US09 & Confirmar cria pedido aguardando pagamento com total = itens + taxa & \cellcolor{green!20}OK \\ \hline
+70 & US09, RN07 & Endereço de outro cliente ou inexistente é recusado & \cellcolor{green!20}OK \\ \hline
+71 & US11 & Cliente vê apenas os seus pedidos, com status e pagamento & \cellcolor{green!20}OK \\ \hline
+72 & US09 & Depois de confirmar, o cliente pode montar um novo carrinho & \cellcolor{green!20}OK \\ \hline
+73 & US14, RN14 & Pedido entregue não pode mais mudar de status & \cellcolor{green!20}OK \\ \hline
+74 & US10 & Não é possível pagar um pedido que já foi pago & \cellcolor{green!20}OK \\ \hline
+75 & US09, RN09 & Carrinho vazio não gera pedido & \cellcolor{green!20}OK \\ \hline
+76 & US14 & Histórico guarda quem alterou o status & \cellcolor{green!20}OK \\ \hline
+77 & US09 & Preço do item fica gravado: mudar o preço depois não altera o pedido & \cellcolor{green!20}OK \\ \hline
+78 & US09, RN09 & Produto inativado depois de entrar no carrinho impede o pedido & \cellcolor{green!20}OK \\ \hline
+79 & US11 & Pedidos aparecem do mais novo para o mais antigo & \cellcolor{green!20}OK \\ \hline
+80 & US09 & Confirmar fecha o carrinho e esvazia a lista & \cellcolor{green!20}OK \\ \hline
+81 & US14, RN14 & Pedido pode ser cancelado enquanto aguarda pagamento & \cellcolor{green!20}OK \\ \hline
+82 & US09 & Confirmar baixa o estoque dos produtos & \cellcolor{green!20}OK \\ \hline
+83 & US15 & Pedido cancelado não entra nas vendas & \cellcolor{green!20}OK \\ \hline
+84 & US14, RN14 & Pular etapa do fluxo é rejeitado & \cellcolor{green!20}OK \\ \hline
+85 & US15 & Mais vendidos vem ordenado por unidades & \cellcolor{green!20}OK \\ \hline
+86 & US14, RN14 & Fluxo completo de status: PAGO, EM\_PREPARO, ENVIADO e ENTREGUE & \cellcolor{green!20}OK \\ \hline
+87 & US15 & Relatório de estoque classifica BAIXO, OK e ESGOTADO & \cellcolor{green!20}OK \\ \hline
 \end{longtable}\normalsize
 \subsection*{BancoDeDadosTest --- Restrições, triggers, views e permissões (13 casos)}
 \footnotesize
@@ -129,59 +133,62 @@
 \hline
 \rowcolor{gray!30} \textbf{N.º} & \textbf{Refere-se a} & \textbf{Caso de teste (comportamento esperado)} & \textbf{Result.} \\ \hline
 \endhead
-84 & US04, ESQUEMA & Um cliente só pode ter um carrinho aberto & \cellcolor{green!20}OK \\ \hline
-85 & RNF08 & Papel da aplicação não pode apagar pedidos nem pagamentos & \cellcolor{green!20}OK \\ \hline
-86 & ACESSO & Senhas de demonstração estão guardadas como hash & \cellcolor{green!20}OK \\ \hline
-87 & US01, US15 & Views de vitrine e estoque respondem com os dados iniciais & \cellcolor{green!20}OK \\ \hline
-88 & ESQUEMA & Subtotal do item do pedido é calculado pelo banco & \cellcolor{green!20}OK \\ \hline
-89 & ESQUEMA & Valores monetários negativos são rejeitados & \cellcolor{green!20}OK \\ \hline
-90 & US10, RN10 & Pagamento processado precisa ter data de processamento & \cellcolor{green!20}OK \\ \hline
-91 & ESQUEMA & Nome de categoria é único & \cellcolor{green!20}OK \\ \hline
-92 & ESQUEMA & Produto com pedidos não pode ser apagado & \cellcolor{green!20}OK \\ \hline
-93 & RN14 & Tabela de transições tem as 7 regras do fluxo & \cellcolor{green!20}OK \\ \hline
-94 & US10, ESQUEMA & Um pedido não pode ter dois pagamentos aprovados & \cellcolor{green!20}OK \\ \hline
-95 & US07, ESQUEMA & Só um endereço principal ativo por cliente & \cellcolor{green!20}OK \\ \hline
-96 & ESQUEMA & Administrador não pode ser cadastrado como cliente & \cellcolor{green!20}OK \\ \hline
+88 & US04, ESQUEMA & Um cliente só pode ter um carrinho aberto & \cellcolor{green!20}OK \\ \hline
+89 & RNF08 & Papel da aplicação não pode apagar pedidos nem pagamentos & \cellcolor{green!20}OK \\ \hline
+90 & ACESSO & Senhas de demonstração estão guardadas como hash & \cellcolor{green!20}OK \\ \hline
+91 & US01, US15 & Views de vitrine e estoque respondem com os dados iniciais & \cellcolor{green!20}OK \\ \hline
+92 & ESQUEMA & Subtotal do item do pedido é calculado pelo banco & \cellcolor{green!20}OK \\ \hline
+93 & ESQUEMA & Valores monetários negativos são rejeitados & \cellcolor{green!20}OK \\ \hline
+94 & US10, RN10 & Pagamento processado precisa ter data de processamento & \cellcolor{green!20}OK \\ \hline
+95 & ESQUEMA & Nome de categoria é único & \cellcolor{green!20}OK \\ \hline
+96 & ESQUEMA & Produto com pedidos não pode ser apagado & \cellcolor{green!20}OK \\ \hline
+97 & RN14 & Tabela de transições tem as 7 regras do fluxo & \cellcolor{green!20}OK \\ \hline
+98 & US10, ESQUEMA & Um pedido não pode ter dois pagamentos aprovados & \cellcolor{green!20}OK \\ \hline
+99 & US07, ESQUEMA & Só um endereço principal ativo por cliente & \cellcolor{green!20}OK \\ \hline
+100 & ESQUEMA & Administrador não pode ser cadastrado como cliente & \cellcolor{green!20}OK \\ \hline
 \end{longtable}\normalsize
-\subsection*{ApiTest --- Rotas, perfis, validações e fluxos completos (35 casos)}
+\subsection*{ApiTest --- Rotas, perfis, validações e fluxos completos (38 casos)}
 \footnotesize
 \begin{longtable}{|c|p{2.5cm}|p{8.4cm}|c|}
 \hline
 \rowcolor{gray!30} \textbf{N.º} & \textbf{Refere-se a} & \textbf{Caso de teste (comportamento esperado)} & \textbf{Result.} \\ \hline
 \endhead
-97 & ROBUSTEZ & Método HTTP não permitido devolve 405; rota inexistente devolve 404 & \cellcolor{green!20}OK \\ \hline
-98 & US03 & Detalhes do produto: 200 se existe e ativo, 404 se não & \cellcolor{green!20}OK \\ \hline
-99 & ACESSO & Rotas protegidas exigem login (401) e rejeitam token inventado & \cellcolor{green!20}OK \\ \hline
-100 & ACESSO & Login válido devolve token, nome e perfil & \cellcolor{green!20}OK \\ \hline
-101 & US12 & Dono cadastra produto novo e ele aparece na vitrine & \cellcolor{green!20}OK \\ \hline
-102 & ACESSO & Cadastro rejeita e-mail repetido, senha curta e telefone inválido & \cellcolor{green!20}OK \\ \hline
-103 & US13, RN03 & Dono edita preço e estoque (detalhes mostram o dado novo); desativar tira da vitrine & \cellcolor{green!20}OK \\ \hline
-104 & US04, RN04 & Quantidade fora de 1 a 99 é recusada com 400 & \cellcolor{green!20}OK \\ \hline
-105 & US14, RN11 & Status inexistente, ausente ou pedido inexistente devolvem 400 & \cellcolor{green!20}OK \\ \hline
-106 & ACESSO & Cadastro de cliente novo e login em seguida & \cellcolor{green!20}OK \\ \hline
-107 & US09, RN09 & Confirmar com carrinho vazio ou sem endereço devolve 400 & \cellcolor{green!20}OK \\ \hline
-108 & US02, RN02 & Categoria inválida gera erro 400 & \cellcolor{green!20}OK \\ \hline
-109 & ROBUSTEZ & JSON malformado devolve 400 (e não erro 500) & \cellcolor{green!20}OK \\ \hline
-110 & US01 & Vitrine é pública e lista os 5 cupcakes ativos & \cellcolor{green!20}OK \\ \hline
-111 & US11 & Cliente só vê os próprios pedidos & \cellcolor{green!20}OK \\ \hline
-112 & US10, RN10 & Pagamento recusado e depois aprovado leva o pedido a PAGO & \cellcolor{green!20}OK \\ \hline
-113 & US01, RN01 & Produto inativo não aparece na vitrine da API & \cellcolor{green!20}OK \\ \hline
-114 & ACESSO & Logout invalida o token & \cellcolor{green!20}OK \\ \hline
-115 & ACESSO & Cliente não acessa o painel do dono (403) e o dono não usa o carrinho (403) & \cellcolor{green!20}OK \\ \hline
-116 & US07 & Cadastrar endereço válido e listá-lo & \cellcolor{green!20}OK \\ \hline
-117 & VIEW & Páginas estáticas são servidas; fora da pasta public dá 404 & \cellcolor{green!20}OK \\ \hline
-118 & ACESSO & Login inválido devolve 401; campos ausentes devolvem 400 & \cellcolor{green!20}OK \\ \hline
-119 & US12, RN12 & Cadastro recusa campos obrigatórios vazios, preço zero e nome repetido & \cellcolor{green!20}OK \\ \hline
-120 & US14, RN14 & Dono muda o status seguindo o fluxo e é barrado ao pular etapas & \cellcolor{green!20}OK \\ \hline
-121 & RNF01, RNF02 & Vitrine e filtro respondem em menos de 1 segundo & \cellcolor{green!20}OK \\ \hline
-122 & US13, RN13 & Editar produto inexistente devolve 400 & \cellcolor{green!20}OK \\ \hline
-123 & ROBUSTEZ & Texto com aspas e acentos no nome do produto volta íntegro no JSON & \cellcolor{green!20}OK \\ \hline
-124 & US09 & Confirmar pedido: 201, estoque baixa e carrinho esvazia & \cellcolor{green!20}OK \\ \hline
-125 & US08, RN08 & Forma de pagamento inválida devolve 400 & \cellcolor{green!20}OK \\ \hline
-126 & US10 & Pedido já pago não pode ser pago de novo; pedido alheio também não & \cellcolor{green!20}OK \\ \hline
-127 & US07, RN07 & Endereço com CEP, UF ou campos obrigatórios inválidos é recusado & \cellcolor{green!20}OK \\ \hline
-128 & US15 & Dashboard devolve vendas, mais vendidos e estoque & \cellcolor{green!20}OK \\ \hline
-129 & US02 & Filtro por categoria retorna só os produtos dela & \cellcolor{green!20}OK \\ \hline
-130 & US04, US06 & Adicionar ao carrinho devolve itens e total atualizados & \cellcolor{green!20}OK \\ \hline
-131 & US05 & Remover item do carrinho atualiza o total & \cellcolor{green!20}OK \\ \hline
+101 & ROBUSTEZ & Método HTTP não permitido devolve 405; rota inexistente devolve 404 & \cellcolor{green!20}OK \\ \hline
+102 & US03 & Detalhes do produto: 200 se existe e ativo, 404 se não & \cellcolor{green!20}OK \\ \hline
+103 & ACESSO & Rotas protegidas exigem login (401) e rejeitam token inventado & \cellcolor{green!20}OK \\ \hline
+104 & ACESSO & Login válido devolve token, nome e perfil & \cellcolor{green!20}OK \\ \hline
+105 & US12 & Dono cadastra produto novo e ele aparece na vitrine & \cellcolor{green!20}OK \\ \hline
+106 & ACESSO & Cadastro rejeita e-mail repetido, senha curta e telefone inválido & \cellcolor{green!20}OK \\ \hline
+107 & US13, RN03 & Dono edita preço e estoque (detalhes mostram o dado novo); desativar tira da vitrine & \cellcolor{green!20}OK \\ \hline
+108 & US04, RN04 & Quantidade fora de 1 a 99 é recusada com 400 & \cellcolor{green!20}OK \\ \hline
+109 & US14, RN11 & Status inexistente, ausente ou pedido inexistente devolvem 400 & \cellcolor{green!20}OK \\ \hline
+110 & ACESSO & Cadastro de cliente novo e login em seguida & \cellcolor{green!20}OK \\ \hline
+111 & US09, RN09 & Confirmar com carrinho vazio ou sem endereço devolve 400 & \cellcolor{green!20}OK \\ \hline
+112 & US02, RN02 & Categoria inválida gera erro 400 & \cellcolor{green!20}OK \\ \hline
+113 & ROBUSTEZ & JSON malformado devolve 400 (e não erro 500) & \cellcolor{green!20}OK \\ \hline
+114 & US01 & Vitrine é pública e lista os 5 cupcakes ativos & \cellcolor{green!20}OK \\ \hline
+115 & US11 & Cliente só vê os próprios pedidos & \cellcolor{green!20}OK \\ \hline
+116 & US10, RN10 & Pagamento recusado e depois aprovado leva o pedido a PAGO & \cellcolor{green!20}OK \\ \hline
+117 & US01, RN01 & Produto inativo não aparece na vitrine da API & \cellcolor{green!20}OK \\ \hline
+118 & US01, RN09 & Vitrine informa o estoque de cada produto para a interface marcar os esgotados (D4) & \cellcolor{green!20}OK \\ \hline
+119 & US05, RN04, RN09 & PUT define a quantidade do item; fora de 1 a 99 ou acima do estoque devolve 400 (D5) & \cellcolor{green!20}OK \\ \hline
+120 & ACESSO & Logout invalida o token & \cellcolor{green!20}OK \\ \hline
+121 & ACESSO & Cliente não acessa o painel do dono (403) e o dono não usa o carrinho (403) & \cellcolor{green!20}OK \\ \hline
+122 & US07 & Cadastrar endereço válido e listá-lo & \cellcolor{green!20}OK \\ \hline
+123 & US04, RN09 & API recusa produto esgotado e quantidade acima do estoque com 400 e mensagem clara (D4) & \cellcolor{green!20}OK \\ \hline
+124 & VIEW & Páginas estáticas são servidas; fora da pasta public dá 404 & \cellcolor{green!20}OK \\ \hline
+125 & ACESSO & Login inválido devolve 401; campos ausentes devolvem 400 & \cellcolor{green!20}OK \\ \hline
+126 & US12, RN12 & Cadastro recusa campos obrigatórios vazios, preço zero e nome repetido & \cellcolor{green!20}OK \\ \hline
+127 & US14, RN14 & Dono muda o status seguindo o fluxo e é barrado ao pular etapas & \cellcolor{green!20}OK \\ \hline
+128 & RNF01, RNF02 & Vitrine e filtro respondem em menos de 1 segundo & \cellcolor{green!20}OK \\ \hline
+129 & US13, RN13 & Editar produto inexistente devolve 400 & \cellcolor{green!20}OK \\ \hline
+130 & ROBUSTEZ & Texto com aspas e acentos no nome do produto volta íntegro no JSON & \cellcolor{green!20}OK \\ \hline
+131 & US09 & Confirmar pedido: 201, estoque baixa e carrinho esvazia & \cellcolor{green!20}OK \\ \hline
+132 & US08, RN08 & Forma de pagamento inválida devolve 400 & \cellcolor{green!20}OK \\ \hline
+133 & US10 & Pedido já pago não pode ser pago de novo; pedido alheio também não & \cellcolor{green!20}OK \\ \hline
+134 & US07, RN07 & Endereço com CEP, UF ou campos obrigatórios inválidos é recusado & \cellcolor{green!20}OK \\ \hline
+135 & US15 & Dashboard devolve vendas, mais vendidos e estoque & \cellcolor{green!20}OK \\ \hline
+136 & US02 & Filtro por categoria retorna só os produtos dela & \cellcolor{green!20}OK \\ \hline
+137 & US04, US06 & Adicionar ao carrinho devolve itens e total atualizados & \cellcolor{green!20}OK \\ \hline
+138 & US05 & Remover item do carrinho atualiza o total & \cellcolor{green!20}OK \\ \hline
 \end{longtable}\normalsize

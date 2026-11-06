@@ -28,8 +28,21 @@ function tabela(colunas, linhas) {
     linhas.map(l => '<tr>' + colunas.map(c => `<td>${c[2] ? c[2](l[c[1]]) : esc(l[c[1]])}</td>`).join('') + '</tr>').join('') + '</table>';
 }
 
+// Atualização automática do dashboard (a cada 10 s; pausa quando a aba está oculta)
+let timerDashboard = null;
+function agendarDashboard() {
+  clearInterval(timerDashboard);
+  timerDashboard = setInterval(() => {
+    if (!admin()) { clearInterval(timerDashboard); return; }
+    if (!document.hidden) carregarDashboard().catch(() => {});
+  }, window.INTERVALO_DASHBOARD_MS || 10000);
+}
+
 async function carregarDashboard() {
   const d = await api('GET', '/api/admin/dashboard');
+  const hora = new Date().toLocaleTimeString('pt-BR');
+  const marca = document.getElementById('dash-atualizado');
+  if (marca) marca.textContent = 'Atualizado às ' + hora + ' (atualização automática a cada 10 s)';
   document.getElementById('dashboard').innerHTML =
     '<h3>Vendas por dia</h3>' + tabela([['Dia', 'dia'], ['Pedidos', 'pedidos'], ['Faturamento', 'faturamento', reais], ['Ticket médio', 'ticketMedio', reais]], d.vendasDiarias) +
     '<h3>Mais vendidos</h3>' + tabela([['Produto', 'nome'], ['Unidades', 'unidades'], ['Receita', 'receita', reais]], d.maisVendidos) +
@@ -122,6 +135,7 @@ async function iniciar() {
   try {
     await carregarCategorias();
     await Promise.all([carregarDashboard(), carregarPedidos(), carregarProdutos()]);
+    agendarDashboard();
   } catch (e) { Sessao.limpar(); iniciar(); }
 }
 iniciar();

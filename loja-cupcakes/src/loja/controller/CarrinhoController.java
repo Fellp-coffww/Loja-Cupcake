@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
-/** GET /api/carrinho | POST /api/carrinho/itens | DELETE /api/carrinho/itens/{cupcakeId} */
+/** GET /api/carrinho | POST /api/carrinho/itens | PUT /api/carrinho/itens/{cupcakeId} | DELETE /api/carrinho/itens/{cupcakeId} */
 public class CarrinhoController implements HttpHandler {
     private final CarrinhoDao dao = new CarrinhoDao();
 
@@ -28,6 +28,12 @@ public class CarrinhoController implements HttpHandler {
                 long qtd = b.get("quantidade") == null ? 1 : Json.longo(b, "quantidade");
                 if (qtd < 1 || qtd > 99) throw new IllegalArgumentException("Quantidade deve ser de 1 a 99");   // RN04
                 dao.adicionar(s.usuarioId(), cupcakeId, (int) qtd);
+                listar(ex, s);
+            } else if (p.length == 4 && m.equals("PUT")) {
+                Map<String, Object> b = Http.corpo(ex);
+                long qtd = Json.longo(b, "quantidade");
+                if (qtd < 1 || qtd > 99) throw new IllegalArgumentException("Quantidade deve ser de 1 a 99");   // RN04
+                dao.definirQuantidade(s.usuarioId(), Long.parseLong(p[3]), (int) qtd);
                 listar(ex, s);
             } else if (p.length == 4 && m.equals("DELETE")) {
                 dao.remover(s.usuarioId(), Long.parseLong(p[3]));
